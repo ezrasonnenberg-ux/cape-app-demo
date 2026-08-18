@@ -46,33 +46,33 @@ jobs:
           push: false
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest,${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
-  deploy-staging:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Set up Kubernetes config
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG_STAGING }}" > $HOME/.kube/config
+  # deploy-staging:
+  #   needs: build-and-test
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/main'
+  #   steps:
+  #     - name: Set up Kubernetes config
+  #       run: |
+  #         mkdir -p $HOME/.kube
+  #         echo "${{ secrets.KUBE_CONFIG_STAGING }}" > $HOME/.kube/config
 
-      - name: Deploy to staging
-        run: |
-          kubectl set image deployment/cape-app-frontend cape-app-frontend=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} -n staging
-          kubectl rollout status deployment/cape-app-frontend -n staging
+  #     - name: Deploy to staging
+  #       run: |
+  #         kubectl set image deployment/cape-app-frontend cape-app-frontend=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} -n staging
+  #         kubectl rollout status deployment/cape-app-frontend -n staging
 
-  deploy-production:
-    needs: deploy-staging
-    runs-on: ubuntu-latest
-    environment: production
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Set up Kubernetes config
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG_PRODUCTION }}" > $HOME/.kube/config
+  # deploy-production:
+  #   needs: deploy-staging
+  #   runs-on: ubuntu-latest
+  #   environment: production
+  #   if: github.ref == 'refs/heads/main'
+  #   steps:
+  #     - name: Set up Kubernetes config
+  #       run: |
+  #         mkdir -p $HOME/.kube
+  #         echo "${{ secrets.KUBE_CONFIG_PRODUCTION }}" > $HOME/.kube/config
 
-      - name: Deploy to production
-        run: |
-          kubectl set image deployment/cape-app-frontend cape-app-frontend=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} -n production
-          kubectl rollout status deployment/cape-app-frontend -n production
+  #     - name: Deploy to production
+  #       run: |
+  #         kubectl set image deployment/cape-app-frontend cape-app-frontend=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} -n production
+  #         kubectl rollout status deployment/cape-app-frontend -n production
